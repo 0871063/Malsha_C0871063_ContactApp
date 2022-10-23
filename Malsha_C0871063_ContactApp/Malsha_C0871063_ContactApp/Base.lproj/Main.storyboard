@@ -183,6 +183,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="addOrFindSegment" destination="qIb-K9-5DA" id="wZD-HH-Uuc"/>
                         <outlet property="companyText" destination="3VB-wK-Nja" id="S3W-S9-oFD"/>
                         <outlet property="emailText" destination="k1t-ik-d0R" id="Cac-Tb-a5R"/>
                         <outlet property="firstNameText" destination="Mus-fm-Zst" id="adf-A9-6g1"/>
