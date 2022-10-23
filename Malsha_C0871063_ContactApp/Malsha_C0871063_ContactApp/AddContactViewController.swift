@@ -24,23 +24,27 @@ class AddContactViewController: UIViewController {
         // Do any additional setup after loading the view.
     }
     
-
     @IBAction func AddOrFindContact(_ sender: UISegmentedControl) {
         switch addOrFindSegment.selectedSegmentIndex {
         case 0:
             break
         case 1 :
             if validFinder() {
-                if let contact = matchingContact(){
-                    selectedContact = contact
-                    self.firstNameText.text = contact.firstName
-                    self.lastNameText.text = contact.lastName
-                    self.companyText.text = contact.company
-                    self.phoneNumberText.text = contact.phoneNumber
-                    self.emailText.text = contact.email
-                    self.addOrFindSegment.selectedSegmentIndex = 0
+                if let contacts = matchingContact(){
+                    if contacts.count == 1 {
+                        selectedContact = contacts[0]
+                        self.firstNameText.text = selectedContact?.firstName
+                        self.lastNameText.text = selectedContact?.lastName
+                        self.companyText.text = selectedContact?.company
+                        self.phoneNumberText.text = selectedContact?.phoneNumber
+                        self.emailText.text = selectedContact?.email
+                    }else{
+                        showAlert(title: "Error", actionTitle: "OK", message: "You have more than one matching contacts for givan details. Please enter more details to find the correct contact", preferredStyle: .alert)
+                        addOrFindSegment.selectedSegmentIndex = 0
+                    }                
                 }else{
                     showAlert(title: "Error", actionTitle: "OK", message: "No matching contact for givan details", preferredStyle: .alert)
+                    addOrFindSegment.selectedSegmentIndex = 0
                 }
             }else{
                 showAlert(title: "Error", actionTitle: "OK", message: "Please enter at-least one field to find contact", preferredStyle: .alert)
@@ -67,7 +71,6 @@ class AddContactViewController: UIViewController {
         }else if emailText.text == "" {
             showAlert(title: "Error", actionTitle: "OK", message: "Email Field is Empty.", preferredStyle: .alert)
         }else{
-
             if var contact = selectedContact {
                 if let row = self.contactList.firstIndex(where: {$0.contactID == contact.contactID}) {
                     contact.firstName = firstNameText.text ?? ""
@@ -92,7 +95,6 @@ class AddContactViewController: UIViewController {
         let cancelAction = UIAlertAction(title: "No Way!", style: .cancel)
         let sureAction = UIAlertAction(title: "Yes, I'm Sure!", style: .default, handler: {_ in
             self.clearTextFields()
-            self.addOrFindSegment.selectedSegmentIndex = 0
         })
         alert.addAction(sureAction)
         alert.addAction(cancelAction)
@@ -112,6 +114,7 @@ class AddContactViewController: UIViewController {
         self.companyText.text = ""
         self.phoneNumberText.text = ""
         self.emailText.text = ""
+        addOrFindSegment.selectedSegmentIndex = 0
     }
     
     private func validFinder() -> Bool{
@@ -122,18 +125,30 @@ class AddContactViewController: UIViewController {
         }
     }
     
-    private func matchingContact() -> Contact?{
+    private func matchingContact() -> [Contact]?{
         
-        if let user = contactList.first(where: {
-            (firstNameText.text != "" && $0.firstName == firstNameText.text) ||
-            (lastNameText.text != "" && $0.lastName == lastNameText.text) ||
-            (companyText.text != "" && $0.company == companyText.text) ||
-            (phoneNumberText.text != "" && $0.phoneNumber == phoneNumberText.text) ||
-            (emailText.text != "" && $0.email == emailText.text)
-        }){
-            return user
-        }else{
+        var filterdContact = contactList
+        
+        if firstNameText.text != "" {
+            filterdContact = filterdContact.filter( { return $0.firstName == firstNameText.text } )
+        }
+        if lastNameText.text != "" {
+            filterdContact = filterdContact.filter( { return $0.lastName == lastNameText.text } )
+        }
+        if companyText.text != "" {
+            filterdContact = filterdContact.filter( { return $0.company == companyText.text } )
+        }
+        if phoneNumberText.text != "" {
+            filterdContact = filterdContact.filter( { return $0.phoneNumber == phoneNumberText.text } )
+        }
+        if emailText.text != "" {
+            filterdContact = filterdContact.filter( { return $0.email == emailText.text } )
+        }
+      
+        if filterdContact.count == 0 {
             return nil
+        }else{
+           return filterdContact
         }
     }
 }
