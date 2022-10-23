@@ -16,6 +16,8 @@ class AddContactViewController: UIViewController {
     @IBOutlet weak var lastNameText: UITextField!
     @IBOutlet weak var addOrFindSegment: UISegmentedControl!
     
+    var contactList = [Contact]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -25,9 +27,9 @@ class AddContactViewController: UIViewController {
     @IBAction func AddOrFindContact(_ sender: UISegmentedControl) {
         switch addOrFindSegment.selectedSegmentIndex {
         case 0:
-            break
+            self.clearTextFields()
         case 1 :
-            break
+            self.clearTextFields()
         default:
             break
         }
@@ -40,16 +42,19 @@ class AddContactViewController: UIViewController {
     @IBAction func saveBtnClicked(_ sender: Any) {
         
         if firstNameText.text == "" {
-            showAlert(title: "Error", actionTitle: "OK", message: "First name cannot be empty.", preferredStyle: .alert)
+            showAlert(title: "Error", actionTitle: "OK", message: "First Name Field is Empty.", preferredStyle: .alert)
         }else if lastNameText.text == "" {
-            showAlert(title: "Error", actionTitle: "OK", message: "Last name cannot be empty.", preferredStyle: .alert)
+            showAlert(title: "Error", actionTitle: "OK", message: "Last Name Field is Empty.", preferredStyle: .alert)
         }else if companyText.text == "" {
-            showAlert(title: "Error", actionTitle: "OK", message: "Company cannot be empty.", preferredStyle: .alert)
+            showAlert(title: "Error", actionTitle: "OK", message: "Company Field is Empty.", preferredStyle: .alert)
         }else if phoneNumberText.text == "" {
-            showAlert(title: "Error", actionTitle: "OK", message: "Phone number cannot be empty.", preferredStyle: .alert)
+            showAlert(title: "Error", actionTitle: "OK", message: "Phone Number Field is Empty.", preferredStyle: .alert)
         }else if emailText.text == "" {
-            showAlert(title: "Error", actionTitle: "OK", message: "Email cannot be empty.", preferredStyle: .alert)
+            showAlert(title: "Error", actionTitle: "OK", message: "Email Field is Empty.", preferredStyle: .alert)
         }else{
+            let message = firstNameText.text! + " is now a contact."
+            showAlert(title: "New Contact Saved", actionTitle: "OK", message: message, preferredStyle: .alert)
+            self.clearTextFields()
             
         }
     }
@@ -59,11 +64,7 @@ class AddContactViewController: UIViewController {
         let alert = UIAlertController(title: "Are you sure?", message: nil, preferredStyle: .actionSheet)
         let cancelAction = UIAlertAction(title: "No Way!", style: .cancel)
         let sureAction = UIAlertAction(title: "Yes, I'm Sure!", style: .default, handler: {_ in
-            self.firstNameText.text = ""
-            self.lastNameText.text = ""
-            self.companyText.text = ""
-            self.phoneNumberText.text = ""
-            self.emailText.text = ""
+            self.clearTextFields()
         })
         alert.addAction(sureAction)
         alert.addAction(cancelAction)
@@ -76,6 +77,14 @@ class AddContactViewController: UIViewController {
         let action = UIAlertAction(title: actionTitle, style: .cancel)
         alert.addAction(action)
         present(alert, animated: true)
+    }
+    
+    private func clearTextFields(){
+        self.firstNameText.text = ""
+        self.lastNameText.text = ""
+        self.companyText.text = ""
+        self.phoneNumberText.text = ""
+        self.emailText.text = ""
     }
     
 }
