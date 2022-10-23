@@ -17,6 +17,7 @@ class AddContactViewController: UIViewController {
     @IBOutlet weak var addOrFindSegment: UISegmentedControl!
     
     var contactList = [Contact]()
+    var selectedContact : Contact?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,12 +31,14 @@ class AddContactViewController: UIViewController {
             break
         case 1 :
             if validFinder() {
-                if let user = matchingContact(){
-                    self.firstNameText.text = user.firstName
-                    self.lastNameText.text = user.lastName
-                    self.companyText.text = user.company
-                    self.phoneNumberText.text = user.phoneNumber
-                    self.emailText.text = user.email
+                if let contact = matchingContact(){
+                    selectedContact = contact
+                    self.firstNameText.text = contact.firstName
+                    self.lastNameText.text = contact.lastName
+                    self.companyText.text = contact.company
+                    self.phoneNumberText.text = contact.phoneNumber
+                    self.emailText.text = contact.email
+                    self.addOrFindSegment.selectedSegmentIndex = 0
                 }else{
                     showAlert(title: "Error", actionTitle: "OK", message: "No matching contact for givan details", preferredStyle: .alert)
                 }
@@ -52,7 +55,7 @@ class AddContactViewController: UIViewController {
         self.view.endEditing(true)
     }
     
-    @IBAction func saveBtnClicked(_ sender: Any) {        
+    @IBAction func saveBtnClicked(_ sender: Any) {
         if firstNameText.text == "" {
             showAlert(title: "Error", actionTitle: "OK", message: "First Name Field is Empty.", preferredStyle: .alert)
         }else if lastNameText.text == "" {
@@ -64,10 +67,22 @@ class AddContactViewController: UIViewController {
         }else if emailText.text == "" {
             showAlert(title: "Error", actionTitle: "OK", message: "Email Field is Empty.", preferredStyle: .alert)
         }else{
-            let newContact = Contact(firstName: firstNameText.text ?? "", lastName: lastNameText.text ?? "",company: companyText.text ?? "",phoneNumber: phoneNumberText.text ?? "",email: emailText.text ?? "")
-            contactList.append(newContact)
-            let message = firstNameText.text! + " is now a contact."
-            showAlert(title: "New Contact Saved", actionTitle: "OK", message: message, preferredStyle: .alert)
+
+            if var contact = selectedContact {
+                if let row = self.contactList.firstIndex(where: {$0.contactID == contact.contactID}) {
+                    contact.firstName = firstNameText.text ?? ""
+                    contact.lastName = lastNameText.text ?? ""
+                    contact.company = companyText.text ?? ""
+                    contact.phoneNumber = phoneNumberText.text ?? ""
+                    contact.email = emailText.text ?? ""
+                    self.contactList[row] = contact
+                }
+            }else{
+                let newContact = Contact(firstName: firstNameText.text ?? "", lastName: lastNameText.text ?? "",company: companyText.text ?? "",phoneNumber: phoneNumberText.text ?? "",email: emailText.text ?? "")
+                contactList.append(newContact)
+                let message = firstNameText.text! + " is now a contact."
+                showAlert(title: "New Contact Saved", actionTitle: "OK", message: message, preferredStyle: .alert)
+            }
             self.clearTextFields()
         }
     }
@@ -108,7 +123,14 @@ class AddContactViewController: UIViewController {
     }
     
     private func matchingContact() -> Contact?{
-        if let user = contactList.first(where: {$0.firstName == firstNameText.text!}){
+        
+        if let user = contactList.first(where: {
+            (firstNameText.text != "" && $0.firstName == firstNameText.text) ||
+            (lastNameText.text != "" && $0.lastName == lastNameText.text) ||
+            (companyText.text != "" && $0.company == companyText.text) ||
+            (phoneNumberText.text != "" && $0.phoneNumber == phoneNumberText.text) ||
+            (emailText.text != "" && $0.email == emailText.text)
+        }){
             return user
         }else{
             return nil

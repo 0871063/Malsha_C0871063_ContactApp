@@ -7,10 +7,23 @@
 
 import Foundation
 
+var incrementID = 0
+
 struct Contact {
+    var contactID = 0
     var firstName = ""
     var lastName = ""
     var company = ""
     var phoneNumber = ""
     var email = ""
+    
+    init(firstName: String = "", lastName: String = "", company: String = "", phoneNumber: String = "", email: String = "") {
+        self.firstName = firstName
+        self.lastName = lastName
+        self.company = company
+        self.phoneNumber = phoneNumber
+        self.email = email
+        self.contactID = incrementID
+        incrementID += 1
+    }
 }
