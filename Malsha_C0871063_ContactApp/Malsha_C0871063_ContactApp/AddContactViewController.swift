@@ -27,9 +27,22 @@ class AddContactViewController: UIViewController {
     @IBAction func AddOrFindContact(_ sender: UISegmentedControl) {
         switch addOrFindSegment.selectedSegmentIndex {
         case 0:
-            self.clearTextFields()
+            break
         case 1 :
-            self.clearTextFields()
+            if validFinder() {
+                if let user = matchingContact(){
+                    self.firstNameText.text = user.firstName
+                    self.lastNameText.text = user.lastName
+                    self.companyText.text = user.company
+                    self.phoneNumberText.text = user.phoneNumber
+                    self.emailText.text = user.email
+                }else{
+                    showAlert(title: "Error", actionTitle: "OK", message: "No matching contact for givan details", preferredStyle: .alert)
+                }
+            }else{
+                showAlert(title: "Error", actionTitle: "OK", message: "Please enter at-least one field to find contact", preferredStyle: .alert)
+                addOrFindSegment.selectedSegmentIndex = 0
+            }
         default:
             break
         }
@@ -39,8 +52,7 @@ class AddContactViewController: UIViewController {
         self.view.endEditing(true)
     }
     
-    @IBAction func saveBtnClicked(_ sender: Any) {
-        
+    @IBAction func saveBtnClicked(_ sender: Any) {        
         if firstNameText.text == "" {
             showAlert(title: "Error", actionTitle: "OK", message: "First Name Field is Empty.", preferredStyle: .alert)
         }else if lastNameText.text == "" {
@@ -52,19 +64,20 @@ class AddContactViewController: UIViewController {
         }else if emailText.text == "" {
             showAlert(title: "Error", actionTitle: "OK", message: "Email Field is Empty.", preferredStyle: .alert)
         }else{
+            let newContact = Contact(firstName: firstNameText.text ?? "", lastName: lastNameText.text ?? "",company: companyText.text ?? "",phoneNumber: phoneNumberText.text ?? "",email: emailText.text ?? "")
+            contactList.append(newContact)
             let message = firstNameText.text! + " is now a contact."
             showAlert(title: "New Contact Saved", actionTitle: "OK", message: message, preferredStyle: .alert)
             self.clearTextFields()
-            
         }
     }
     
     @IBAction func cancelBtnClicked(_ sender: Any) {
-        
         let alert = UIAlertController(title: "Are you sure?", message: nil, preferredStyle: .actionSheet)
         let cancelAction = UIAlertAction(title: "No Way!", style: .cancel)
         let sureAction = UIAlertAction(title: "Yes, I'm Sure!", style: .default, handler: {_ in
             self.clearTextFields()
+            self.addOrFindSegment.selectedSegmentIndex = 0
         })
         alert.addAction(sureAction)
         alert.addAction(cancelAction)
@@ -72,7 +85,6 @@ class AddContactViewController: UIViewController {
     }
     
     private func showAlert(title : String, actionTitle : String, message : String, preferredStyle : UIAlertController.Style){
-        
         let alert = UIAlertController(title:title , message:message , preferredStyle: preferredStyle)
         let action = UIAlertAction(title: actionTitle, style: .cancel)
         alert.addAction(action)
@@ -87,5 +99,20 @@ class AddContactViewController: UIViewController {
         self.emailText.text = ""
     }
     
+    private func validFinder() -> Bool{
+        if firstNameText.text != "" || lastNameText.text != "" || companyText.text != "" || phoneNumberText.text != "" || emailText.text != "" {
+            return true
+        }else{
+            return false
+        }
+    }
+    
+    private func matchingContact() -> Contact?{
+        if let user = contactList.first(where: {$0.firstName == firstNameText.text!}){
+            return user
+        }else{
+            return nil
+        }
+    }
 }
 

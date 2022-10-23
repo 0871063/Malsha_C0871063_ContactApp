@@ -10,7 +10,7 @@ import Foundation
 struct Contact {
     var firstName = ""
     var lastName = ""
-    var companyText = ""
-    var phoneNumberText = ""
-    var emailText = ""
+    var company = ""
+    var phoneNumber = ""
+    var email = ""
 }
